@@ -21,7 +21,7 @@ class Mobility(object):
                 self.process_request(ctx.request)
 
     def process_request(self, request):
-        ua_str = request.user_agent.string.lower()
+        ua_str = request.user_agent.string
 
         user_agent = parse_user_agent(ua_str)
 
