@@ -1,6 +1,7 @@
-import re
 
 from flask import _request_ctx_stack as stack
+
+from user_agents import parse as parse_user_agent
 
 
 class Mobility(object):
@@ -12,12 +13,6 @@ class Mobility(object):
 
     def init_app(self, app):
         self.app = app
-        app.config.setdefault(
-            'MOBILE_USER_AGENTS',
-            'android|fennec|iemobile|iphone|opera (?:mini|mobi)|mobile')
-        app.config.setdefault('MOBILE_COOKIE', 'mobile')
-
-        self.USER_AGENTS = re.compile(app.config.get('MOBILE_USER_AGENTS'))
 
         @app.before_request
         def before_request():
@@ -26,8 +21,12 @@ class Mobility(object):
                 self.process_request(ctx.request)
 
     def process_request(self, request):
-        ua = request.user_agent.string.lower()
-        mc = request.cookies.get(self.app.config.get('MOBILE_COOKIE'))
+        ua_str = request.user_agent.string.lower()
 
-        request.MOBILE = (mc == 'on' or
-                          (mc != 'off' and self.USER_AGENTS.search(ua)))
+        user_agent = parse_user_agent(ua_str)
+
+        request.DESKTOP = user_agent.is_pc
+        request.MOBILE = user_agent.is_mobile
+        request.TABLET = user_agent.is_tablet
+        request.TOUCH_CAPABLE = user_agent.is_touch_capable
+        request.BOT = user_agent.is_bot

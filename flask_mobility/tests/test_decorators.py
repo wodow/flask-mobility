@@ -4,6 +4,8 @@ from flask import Flask, render_template_string
 from flask.ext.mobility import Mobility
 from flask.ext.mobility.decorators import mobile_template, mobilized
 
+from constants import ANDROID_BROWSER_UA
+
 
 class DecoratorsTestCase(unittest.TestCase):
 
@@ -36,20 +38,9 @@ class DecoratorsTestCase(unittest.TestCase):
         assert b'template.html' == self.client.get('/').data
 
         # Check with mobile User-Agent header
-        headers = [('User-Agent', 'android')]
+        headers = [('User-Agent', ANDROID_BROWSER_UA)]
         response = self.client.get('/', headers=headers)
         assert b'mobile/template.html' == response.data
-
-    def test_mobile_template_cookie(self):
-        assert b'template.html' == self.client.get('/').data
-
-        MOBILE_COOKIE = self.app.config.get('MOBILE_COOKIE')
-
-        self.client.set_cookie('localhost', MOBILE_COOKIE, 'on')
-        assert b'mobile/template.html' == self.client.get('/').data
-
-        self.client.set_cookie('localhost', MOBILE_COOKIE, 'off')
-        assert b'template.html' == self.client.get('/').data
 
     def test_mobilized_user_agent(self):
         """Test the mobilized decorator"""
@@ -58,16 +49,5 @@ class DecoratorsTestCase(unittest.TestCase):
         assert b'False' == self.client.get('/mobilize').data
 
         # Check with mobile User-Agent header
-        headers = [('User-Agent', 'android')]
+        headers = [('User-Agent', ANDROID_BROWSER_UA)]
         assert b'True' == self.client.get('/mobilize', headers=headers).data
-
-    def test_mobilized_cookie(self):
-        assert b'False' == self.client.get('/mobilize').data
-
-        MOBILE_COOKIE = self.app.config.get('MOBILE_COOKIE')
-
-        self.client.set_cookie('localhost', MOBILE_COOKIE, 'on')
-        assert b'True' == self.client.get('/mobilize').data
-
-        self.client.set_cookie('localhost', MOBILE_COOKIE, 'off')
-        assert b'False' == self.client.get('/mobilize').data

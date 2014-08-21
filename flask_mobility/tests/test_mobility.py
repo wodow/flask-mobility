@@ -3,6 +3,8 @@ import unittest
 from flask import Flask, render_template_string
 from flask.ext.mobility import Mobility
 
+from constants import ANDROID_BROWSER_UA
+
 
 class MobilityTestCase(unittest.TestCase):
 
@@ -25,18 +27,5 @@ class MobilityTestCase(unittest.TestCase):
         assert b'False' == self.app.get('/').data
 
         # Check with mobile User-Agent header
-        headers = [('User-Agent', 'android')]
+        headers = [('User-Agent', ANDROID_BROWSER_UA)]
         assert b'True' == self.app.get('/', headers=headers).data
-
-    def test_mobile_cookie(self):
-        """Check that the mobile cookie value is respected"""
-        MOBILE_COOKIE = self.config.get('MOBILE_COOKIE')
-
-        # Check cookie is set to 'on'
-        self.app.set_cookie('localhost', MOBILE_COOKIE, 'on')
-        assert b'True' == self.app.get('/').data
-
-        # Check cookie is set to 'off'
-        self.app.set_cookie('localhost', MOBILE_COOKIE, 'off')
-        headers = [('User-Agent', 'android')]
-        assert b'False' == self.app.get('/', headers=headers).data
