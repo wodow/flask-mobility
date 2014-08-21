@@ -1,6 +1,6 @@
 import os
 import re
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -32,7 +32,8 @@ setup(
     include_package_data=True,
     platforms='any',
     install_requires=[
-        'Flask'
+        'Flask',
+        'user-agents >= 0.2.0',
     ],
     test_suite='flask_mobility.tests.suite',
     classifiers=[
